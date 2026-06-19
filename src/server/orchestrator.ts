@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { AnswerRecord, AskRequest, IngestRequest, TraceStep } from "../shared/types.js";
+import type { AnswerRecord, AskRequest, IngestRequest, SourceSnippet, TraceStep } from "../shared/types.js";
 import { buildGroundedPrompt, QvacRuntime } from "./qvac.js";
 import { chunkText, LocalStore, type ChunkRecord } from "./storage.js";
 import { appendEvidenceLog } from "./logger.js";
@@ -179,8 +179,21 @@ function normalizeLabel(value: string) {
   return labels.find((label) => lowered.includes(label)) ?? "document_qa";
 }
 
-function ensureSourceMarkers(answer: string, sources: unknown[]) {
+function ensureSourceMarkers(answer: string, sources: SourceSnippet[]) {
+  const visibleAnswer = answer.replace(/Local source references:[\s\S]*$/i, "").trim();
+  if (visibleAnswer.length < 40) return buildExtractiveAnswer(sources);
   if (!sources.length || /\[source\s+\d+\]/i.test(answer)) return answer;
   const markers = sources.map((_, index) => `[source ${index + 1}]`).join(", ");
   return `${answer.trim()}\n\nLocal source references: ${markers}.`;
+}
+
+function buildExtractiveAnswer(sources: SourceSnippet[]) {
+  if (!sources.length) {
+    return "I could not find enough local source material to answer. Add relevant notes, then ask again.";
+  }
+  const bullets = sources.slice(0, 3).map((source, index) => {
+    const cleanText = source.text.replace(/^#+\s*/, "").trim().replace(/\s+/g, " ");
+    return `- ${cleanText} [source ${index + 1}]`;
+  });
+  return ["Based on the local documents:", "", ...bullets].join("\n");
 }
