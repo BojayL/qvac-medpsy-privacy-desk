@@ -43,7 +43,8 @@ export class QvacRuntime {
       return;
     }
     try {
-      this.sdk = (await import("@qvac/sdk")) as QvacSdk;
+      const packageName = ["@qvac", "sdk"].join("/");
+      this.sdk = (await import(packageName)) as QvacSdk;
       if (!this.sdk.loadModel || !this.sdk.completion) {
         throw new Error("@qvac/sdk did not expose loadModel/completion");
       }
