@@ -13,5 +13,6 @@ QVAC SDK usage:
 - `loadModel` loads the local LLM.
 - `completion` performs intake classification, answer drafting, and verifier review.
 - `embed` generates local embeddings for document chunks and questions.
+- Local retrieval uses those QVAC-generated embeddings with deterministic cosine similarity over a local JSON vector store.
 
 No OpenAI, Anthropic, cloud embedding, or hosted vector database dependency is used.

@@ -5,6 +5,7 @@
 - [ ] QVAC model loads on consumer hardware.
 - [ ] Embeddings are generated locally.
 - [ ] Answers are generated locally.
+- [ ] Local retrieval uses QVAC-generated embeddings only.
 - [ ] Source snippets are shown.
 - [ ] Agent trace is visible.
 - [ ] Hardware status is recorded.

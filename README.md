@@ -8,7 +8,7 @@ This project targets **QVAC Hackathon I / General Purpose**. It is not a diagnos
 
 - Local `.txt` and `.md` document ingestion.
 - Embeddings generated through `@qvac/sdk`.
-- Local vector retrieval over private chunks.
+- Local vector retrieval over private chunks using QVAC-generated embeddings.
 - Answers generated through `@qvac/sdk`, with source snippets shown in the UI.
 - Visible workflow trace: Intake Agent -> Retriever Agent -> Answer Agent -> Verifier Agent.
 - Local tool calls: `searchLocalDocs`, `showSources`, `exportBrief`, `hardwareStatus`, and `offlineCheck`.
@@ -105,7 +105,8 @@ npm start
 ## Known Limitations
 
 - PDF ingestion is not included in the core demo.
-- The current local vector store is intentionally simple and transparent; embeddings and answer generation remain QVAC-powered.
+- The current local vector store is intentionally simple and transparent; embeddings and answer generation remain QVAC-powered through `@qvac/sdk`.
+- `@qvac/rag` was evaluated, but its current HyperDB/RocksDB dependency path made Windows installation less reliable for the demo machine. A future adapter can replace the transparent JSON vector store after the core QVAC SDK path is stable.
 - `QVAC_ALLOW_MOCK=1` exists only to develop and test the interface without a loaded model. It must be disabled for final judging evidence.
 
 ## License

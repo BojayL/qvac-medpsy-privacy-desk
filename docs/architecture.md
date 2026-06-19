@@ -7,7 +7,7 @@ QVAC MedPsy Privacy Desk is a local web application with a browser UI and a Node
 - Browser UI: operational dashboard for ingestion, asking questions, reviewing sources, and recording offline checks.
 - Local App Server: HTTP API, orchestration, local tools, evidence logs.
 - QVAC Runtime Adapter: wraps `@qvac/sdk` `loadModel`, `completion`, and `embed`.
-- Local Store: JSON-backed local corpus, chunks, embeddings, and recent answers.
+- Local Store: JSON-backed local corpus, chunks, QVAC-generated embeddings, and recent answers.
 - Evidence Bundle: markdown files and NDJSON logs for reproducibility.
 
 ## Agent Flow
