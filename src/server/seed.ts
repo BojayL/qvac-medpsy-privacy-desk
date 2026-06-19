@@ -14,8 +14,12 @@ const qvac = new QvacRuntime({
 });
 const orchestrator = new PrivacyDeskOrchestrator(store, qvac);
 
-for (const fileName of ["appointment-prep.md", "sleep-hygiene.md", "stress-grounding.md"]) {
-  const content = await readFile(path.join(process.cwd(), "examples", "sample-docs", fileName), "utf8");
-  const document = await orchestrator.ingest({ name: fileName, content });
-  process.stdout.write(`Indexed ${document.name} (${document.chunkCount} chunks)\n`);
+try {
+  for (const fileName of ["appointment-prep.md", "sleep-hygiene.md", "stress-grounding.md"]) {
+    const content = await readFile(path.join(process.cwd(), "examples", "sample-docs", fileName), "utf8");
+    const document = await orchestrator.ingest({ name: fileName, content });
+    process.stdout.write(`Indexed ${document.name} (${document.chunkCount} chunks)\n`);
+  }
+} finally {
+  await qvac.unload();
 }

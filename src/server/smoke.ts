@@ -11,10 +11,14 @@ const qvac = new QvacRuntime({
 });
 const orchestrator = new PrivacyDeskOrchestrator(store, qvac);
 
-const answer = await orchestrator.ask({
-  question: process.argv.slice(2).join(" ") || "What should I prepare before a wellness appointment?",
-  topK: 3
-});
+try {
+  const answer = await orchestrator.ask({
+    question: process.argv.slice(2).join(" ") || "What should I prepare before a wellness appointment?",
+    topK: 3
+  });
 
-process.stdout.write(JSON.stringify(answer, null, 2));
-process.stdout.write("\n");
+  process.stdout.write(JSON.stringify(answer, null, 2));
+  process.stdout.write("\n");
+} finally {
+  await qvac.unload();
+}
