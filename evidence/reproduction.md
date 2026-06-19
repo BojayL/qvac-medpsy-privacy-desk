@@ -2,8 +2,8 @@
 
 1. Install Node.js 22.17 or newer.
 2. Clone the public repository.
-3. For fast UI validation, run `npm install --omit=optional`.
-4. For final QVAC inference, run `npm install` so optional QVAC runtime packages are installed.
+3. Run `npm install`.
+4. For final QVAC inference, run `npm install @qvac/sdk b4a --save`.
 5. Configure QVAC model environment variables if needed:
 
 ```bash
