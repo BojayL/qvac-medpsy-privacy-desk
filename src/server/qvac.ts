@@ -58,7 +58,7 @@ export class QvacRuntime {
       this.modelId = await this.sdk.loadModel({
         modelSrc,
         modelType: "llamacpp-completion",
-        modelConfig: buildModelConfig(this.sdk),
+        modelConfig: buildModelConfig(this.sdk, true),
         onProgress: (progress: unknown) => {
           process.stdout.write(`QVAC load progress: ${JSON.stringify(progress)}\n`);
         }
@@ -104,7 +104,7 @@ export class QvacRuntime {
       this.embeddingModelId = await this.sdk.loadModel({
         modelSrc,
         modelType: "llamacpp-embedding",
-        modelConfig: buildModelConfig(this.sdk),
+        modelConfig: buildModelConfig(this.sdk, false),
         onProgress: (progress: unknown) => {
           process.stdout.write(`QVAC embedding load progress: ${JSON.stringify(progress)}\n`);
         }
@@ -176,11 +176,11 @@ function resolveModelSource(sdk: QvacSdk, configured: string) {
   return configured;
 }
 
-function buildModelConfig(sdk: QvacSdk) {
+function buildModelConfig(sdk: QvacSdk, includeContext: boolean) {
   const verbosity = sdk.VERBOSITY;
   return {
     device: process.env.QVAC_DEVICE ?? "gpu",
-    ctx_size: Number(process.env.QVAC_CTX_SIZE ?? 4096),
+    ...(includeContext ? { ctx_size: Number(process.env.QVAC_CTX_SIZE ?? 4096) } : {}),
     ...(isRecord(verbosity) && "ERROR" in verbosity ? { verbosity: verbosity.ERROR } : {})
   };
 }
