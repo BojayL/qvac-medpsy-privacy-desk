@@ -89,7 +89,7 @@ export class QvacRuntime {
       }
     });
 
-    return await readCompletionText(result);
+    return sanitizeCompletion(await readCompletionText(result));
   }
 
   async embed(text: string) {
@@ -231,6 +231,13 @@ function readEmbedding(result: unknown) {
     }
   }
   throw new Error(`Unable to read embedding result from QVAC SDK: ${JSON.stringify(result).slice(0, 500)}`);
+}
+
+function sanitizeCompletion(text: string) {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/<think>[\s\S]*$/gi, "")
+    .trim();
 }
 
 function mockEmbedding(text: string) {

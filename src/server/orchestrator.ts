@@ -58,14 +58,16 @@ export class PrivacyDeskOrchestrator {
     if (!question) throw new Error("Question is required.");
 
     const intake = await timed("Intake Agent", "Classify request", async () => {
-      return await this.qvac.complete([
+      return normalizeLabel(await this.qvac.complete([
         {
           role: "system",
-          content:
-            "Classify the user request for a local wellness document assistant. Return one short label: document_qa, summary, preparation_note, safety_sensitive, or out_of_scope."
+          content: [
+            "Classify the user request for a local wellness document assistant.",
+            "Return only one label with no reasoning: document_qa, summary, preparation_note, safety_sensitive, or out_of_scope."
+          ].join(" ")
         },
         { role: "user", content: `classify: ${question}` }
-      ]);
+      ]));
     });
     trace.push(intake.step);
 
@@ -79,14 +81,18 @@ export class PrivacyDeskOrchestrator {
     });
 
     const answer = await timed("Answer Agent", "Draft grounded answer", async () => {
-      return await this.qvac.complete([
+      const draft = await this.qvac.complete([
         {
           role: "system",
-          content:
-            "You produce concise, source-grounded educational answers from local documents. Include inline source markers."
+          content: [
+            "You produce concise, source-grounded educational answers from local documents.",
+            "Do not include hidden reasoning.",
+            "Every bullet or paragraph that uses local context must include an inline marker such as [source 1]."
+          ].join(" ")
         },
         { role: "user", content: buildGroundedPrompt(question, retrieval.value) }
       ]);
+      return ensureSourceMarkers(draft, retrieval.value);
     });
     trace.push(answer.step);
 
@@ -165,4 +171,16 @@ function summarize(value: unknown) {
   if (typeof value === "string") return value.slice(0, 220);
   if (Array.isArray(value)) return `${value.length} item(s)`;
   return JSON.stringify(value).slice(0, 220);
+}
+
+function normalizeLabel(value: string) {
+  const labels = ["document_qa", "summary", "preparation_note", "safety_sensitive", "out_of_scope"];
+  const lowered = value.toLowerCase();
+  return labels.find((label) => lowered.includes(label)) ?? "document_qa";
+}
+
+function ensureSourceMarkers(answer: string, sources: unknown[]) {
+  if (!sources.length || /\[source\s+\d+\]/i.test(answer)) return answer;
+  const markers = sources.map((_, index) => `[source ${index + 1}]`).join(", ");
+  return `${answer.trim()}\n\nLocal source references: ${markers}.`;
 }
