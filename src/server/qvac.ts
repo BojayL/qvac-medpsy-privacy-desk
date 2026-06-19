@@ -1,4 +1,7 @@
 import type { SourceSnippet } from "../shared/types.js";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 type QvacSdk = {
   loadModel?: (opts: Record<string, unknown>) => Promise<string>;
@@ -43,8 +46,7 @@ export class QvacRuntime {
       return;
     }
     try {
-      const packageName = ["@qvac", "sdk"].join("/");
-      this.sdk = (await import(packageName)) as QvacSdk;
+      this.sdk = await importQvacSdk();
       if (!this.sdk.loadModel || !this.sdk.completion) {
         throw new Error("@qvac/sdk did not expose loadModel/completion");
       }
@@ -116,6 +118,17 @@ export class QvacRuntime {
       sourceLines ? `Local source context considered:\n${sourceLines}` : "No local source context was supplied."
     ].join("\n\n");
   }
+}
+
+async function importQvacSdk() {
+  const packageName = ["@qvac", "sdk"].join("/");
+  const runtimeModules = process.env.QVAC_RUNTIME_NODE_MODULES;
+  if (runtimeModules) {
+    const requireFromRuntime = createRequire(path.join(runtimeModules, "qvac-runtime.cjs"));
+    const sdkPath = requireFromRuntime.resolve(packageName);
+    return (await import(pathToFileURL(sdkPath).href)) as QvacSdk;
+  }
+  return (await import(packageName)) as QvacSdk;
 }
 
 export function buildGroundedPrompt(question: string, sources: SourceSnippet[]) {

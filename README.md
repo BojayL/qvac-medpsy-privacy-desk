@@ -53,8 +53,9 @@ npm install
 
 Enable final local QVAC inference:
 
-```bash
-npm install @qvac/sdk b4a @qvac/llm-llamacpp @qvac/embed-llamacpp --save
+```powershell
+.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-runtime
+$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-runtime\node_modules"
 ```
 
 Seed sample local documents:
@@ -115,7 +116,7 @@ npm start
 - PDF ingestion is not included in the core demo.
 - The current local vector store is intentionally simple and transparent; embeddings and answer generation remain QVAC-powered through `@qvac/sdk`.
 - `@qvac/rag` was evaluated, but its current HyperDB/RocksDB dependency path made Windows installation less reliable for the demo machine. A future adapter can replace the transparent JSON vector store after the core QVAC SDK path is stable.
-- `@qvac/sdk` is installed as an explicit final-runtime step because its native runtime packages can be slow or network-sensitive on fresh Windows machines.
+- `@qvac/sdk` is installed into an isolated runtime directory because its native runtime packages can be slow or network-sensitive on fresh Windows machines.
 - `QVAC_ALLOW_MOCK=1` exists only to develop and test the interface without a loaded model. It must be disabled for final judging evidence.
 
 ## License

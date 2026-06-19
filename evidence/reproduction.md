@@ -3,7 +3,12 @@
 1. Install Node.js 22.17 or newer.
 2. Clone the public repository.
 3. Run `npm install`.
-4. For final QVAC inference, run `npm install @qvac/sdk b4a @qvac/llm-llamacpp @qvac/embed-llamacpp --save`.
+4. For final QVAC inference on Windows, run:
+
+```powershell
+.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-runtime
+$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-runtime\node_modules"
+```
 5. Configure QVAC model environment variables if needed:
 
 ```bash
