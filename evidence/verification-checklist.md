@@ -1,7 +1,7 @@
 # Verification Checklist
 
 - [ ] `@qvac/sdk` is installed.
-- [ ] Final runtime dependencies were installed with `npm install @qvac/sdk b4a --save`.
+- [ ] Final runtime dependencies were installed with `npm install @qvac/sdk b4a @qvac/llm-llamacpp @qvac/embed-llamacpp --save`.
 - [ ] Final run does not set `QVAC_ALLOW_MOCK=1`.
 - [ ] QVAC model loads on consumer hardware.
 - [ ] Embeddings are generated locally.

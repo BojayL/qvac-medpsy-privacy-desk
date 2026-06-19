@@ -157,17 +157,7 @@ async function timed<T>(
       }
     };
   } catch (error) {
-    return {
-      value: Promise.reject(error) as never,
-      step: {
-        id: randomUUID(),
-        agent,
-        label,
-        status: "error",
-        detail: error instanceof Error ? error.message : String(error),
-        latencyMs: Date.now() - started
-      }
-    };
+    throw error;
   }
 }
 

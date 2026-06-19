@@ -54,7 +54,7 @@ npm install
 Enable final local QVAC inference:
 
 ```bash
-npm install @qvac/sdk b4a --save
+npm install @qvac/sdk b4a @qvac/llm-llamacpp @qvac/embed-llamacpp --save
 ```
 
 Seed sample local documents:
