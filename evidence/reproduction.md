@@ -13,11 +13,16 @@ $env:QVAC_SDK_FLAVOR="full"
 5. Configure QVAC model environment variables if needed:
 
 ```powershell
-$env:QVAC_LLM_MODEL="C:\qvac-models\MedPsy-1.7B-Q4_K_M.gguf"
-$env:QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
+$env:QVAC_LLM_MODEL="C:\qvac-models\medpsy-1.7b-q4_k_m-imat.gguf"
+$env:QVAC_EMBEDDING_MODEL="C:\qvac-models\embeddinggemma-300m-Q4_0.gguf"
 ```
 
 For a stable fallback demo, set `$env:QVAC_LLM_MODEL="LLAMA_3_2_1B_INST_Q4_0"` after the official model is downloaded or cached. The MedPsy repository name alone is not a model file path; download a GGUF first when using MedPsy.
+
+Validated Windows model files:
+
+- `C:\qvac-models\medpsy-1.7b-q4_k_m-imat.gguf`
+- `C:\qvac-models\embeddinggemma-300m-Q4_0.gguf`
 
 6. Seed local sample documents:
 

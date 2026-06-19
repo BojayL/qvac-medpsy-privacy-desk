@@ -68,11 +68,16 @@ QVAC_ALLOW_MOCK=1 npm run seed
 For real submission runs, do not use mock mode. Configure QVAC model sources if needed:
 
 ```powershell
-$env:QVAC_LLM_MODEL="C:\qvac-models\MedPsy-1.7B-Q4_K_M.gguf"
-$env:QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
+$env:QVAC_LLM_MODEL="C:\qvac-models\medpsy-1.7b-q4_k_m-imat.gguf"
+$env:QVAC_EMBEDDING_MODEL="C:\qvac-models\embeddinggemma-300m-Q4_0.gguf"
 ```
 
 `QVAC_LLM_MODEL` may be an official QVAC SDK model constant such as `LLAMA_3_2_1B_INST_Q4_0`, a local GGUF file path, or another model source accepted by `@qvac/sdk`. The MedPsy Hugging Face repository name is not by itself a local model file; download the GGUF first and point this variable at the downloaded path.
+
+The Windows RTX 5060 validation run used local MedPsy and embedding GGUF files at:
+
+- `C:\qvac-models\medpsy-1.7b-q4_k_m-imat.gguf`
+- `C:\qvac-models\embeddinggemma-300m-Q4_0.gguf`
 
 Run the app:
 
