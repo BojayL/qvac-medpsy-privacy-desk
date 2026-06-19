@@ -9,6 +9,7 @@ type QvacSdk = {
   completion?: (opts: Record<string, unknown>) => PromiseLike<unknown> | unknown;
   embed?: (opts: Record<string, unknown>) => PromiseLike<unknown> | unknown;
   LLAMA_3_2_1B_INST_Q4_0?: string;
+  [key: string]: unknown;
 };
 
 type CompletionMessage = {
@@ -25,6 +26,7 @@ export type QvacConfig = {
 export class QvacRuntime {
   private sdk: QvacSdk | null = null;
   private modelId: string | null = null;
+  private embeddingModelId: string | null = null;
   private mode: "qvac" | "mock" | "unavailable" = "unavailable";
 
   constructor(private readonly config: QvacConfig) {
@@ -50,11 +52,11 @@ export class QvacRuntime {
       if (!this.sdk.loadModel || !this.sdk.completion) {
         throw new Error("@qvac/sdk did not expose loadModel/completion");
       }
-      const modelSrc = this.config.llmModel || this.sdk.LLAMA_3_2_1B_INST_Q4_0;
+      const modelSrc = resolveModelSource(this.sdk, this.config.llmModel) || this.sdk.LLAMA_3_2_1B_INST_Q4_0;
       if (!modelSrc) throw new Error("No QVAC model source configured");
       this.modelId = await this.sdk.loadModel({
         modelSrc,
-        modelType: "llm",
+        modelType: "llamacpp-completion",
         onProgress: (progress: unknown) => {
           process.stdout.write(`QVAC load progress: ${JSON.stringify(progress)}\n`);
         }
@@ -85,13 +87,24 @@ export class QvacRuntime {
   async embed(text: string) {
     await this.initialize();
     if (this.mode === "mock") return mockEmbedding(text);
-    if (!this.sdk?.embed) {
+    if (!this.sdk?.embed || !this.sdk.loadModel) {
       throw new Error("@qvac/sdk embed() is unavailable; install a QVAC embedding-capable SDK/runtime.");
+    }
+    if (!this.embeddingModelId) {
+      const modelSrc = resolveModelSource(this.sdk, this.config.embeddingModel);
+      if (!modelSrc) throw new Error("No QVAC embedding model source configured");
+      this.embeddingModelId = await this.sdk.loadModel({
+        modelSrc,
+        modelType: "llamacpp-embedding",
+        onProgress: (progress: unknown) => {
+          process.stdout.write(`QVAC embedding load progress: ${JSON.stringify(progress)}\n`);
+        }
+      });
     }
 
     const result = await this.sdk.embed({
-      modelSrc: this.config.embeddingModel,
-      input: text
+      modelId: this.embeddingModelId,
+      text
     });
     return readEmbedding(result);
   }
@@ -100,7 +113,11 @@ export class QvacRuntime {
     if (this.sdk?.unloadModel && this.modelId) {
       await this.sdk.unloadModel({ modelId: this.modelId });
     }
+    if (this.sdk?.unloadModel && this.embeddingModelId) {
+      await this.sdk.unloadModel({ modelId: this.embeddingModelId });
+    }
     this.modelId = null;
+    this.embeddingModelId = null;
   }
 
   private mockCompletion(history: CompletionMessage[]) {
@@ -123,12 +140,30 @@ export class QvacRuntime {
 async function importQvacSdk() {
   const packageName = ["@qvac", "sdk"].join("/");
   const runtimeModules = process.env.QVAC_RUNTIME_NODE_MODULES;
-  if (runtimeModules) {
+  const importFromRuntime = async (specifier: string) => {
+    if (!runtimeModules) return await import(specifier);
     const requireFromRuntime = createRequire(path.join(runtimeModules, "qvac-runtime.cjs"));
-    const sdkPath = requireFromRuntime.resolve(packageName);
-    return (await import(pathToFileURL(sdkPath).href)) as QvacSdk;
+    const modulePath = requireFromRuntime.resolve(specifier);
+    return await import(pathToFileURL(modulePath).href);
+  };
+
+  if (runtimeModules) {
+    try {
+      const bareSdk = await importFromRuntime(["@qvac", "bare-sdk"].join("/"));
+      const llm = await importFromRuntime("@qvac/bare-sdk/llamacpp-completion/plugin");
+      const embedding = await importFromRuntime("@qvac/bare-sdk/llamacpp-embedding/plugin");
+      return bareSdk.plugins([llm.llmPlugin, embedding.embeddingsPlugin]) as QvacSdk;
+    } catch (error) {
+      if (process.env.QVAC_SDK_FLAVOR === "bare") throw error;
+    }
   }
-  return (await import(packageName)) as QvacSdk;
+  return (await importFromRuntime(packageName)) as QvacSdk;
+}
+
+function resolveModelSource(sdk: QvacSdk, configured: string) {
+  const value = sdk[configured];
+  if (typeof value === "string" || isRecord(value)) return value;
+  return configured;
 }
 
 export function buildGroundedPrompt(question: string, sources: SourceSnippet[]) {

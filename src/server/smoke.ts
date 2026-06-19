@@ -6,7 +6,7 @@ const store = new LocalStore();
 await store.load();
 const qvac = new QvacRuntime({
   llmModel: process.env.QVAC_LLM_MODEL ?? "qvac/MedPsy-1.7B-GGUF",
-  embeddingModel: process.env.QVAC_EMBEDDING_MODEL ?? "qvac/MedPsy-1.7B-GGUF",
+  embeddingModel: process.env.QVAC_EMBEDDING_MODEL ?? "EMBEDDINGGEMMA_300M_Q4_0",
   allowMock: process.env.QVAC_ALLOW_MOCK === "1"
 });
 const orchestrator = new PrivacyDeskOrchestrator(store, qvac);

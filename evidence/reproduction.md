@@ -13,7 +13,7 @@ $env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-runtime\node_modules"
 
 ```bash
 export QVAC_LLM_MODEL="qvac/MedPsy-1.7B-GGUF"
-export QVAC_EMBEDDING_MODEL="qvac/MedPsy-1.7B-GGUF"
+export QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
 ```
 
 6. Seed local sample documents:

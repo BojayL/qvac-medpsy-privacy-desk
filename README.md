@@ -68,7 +68,7 @@ For real submission runs, do not use mock mode. Configure QVAC model sources if 
 
 ```bash
 export QVAC_LLM_MODEL="qvac/MedPsy-1.7B-GGUF"
-export QVAC_EMBEDDING_MODEL="qvac/MedPsy-1.7B-GGUF"
+export QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
 ```
 
 Run the app:
