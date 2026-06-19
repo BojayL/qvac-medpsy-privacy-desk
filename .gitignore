@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-server/
+.qvac-data/
+.env
+.env.local
+npm-debug.log*
+*.tsbuildinfo
+evidence/logs/*.ndjson
+evidence/screenshots/*.png
+evidence/videos/*
+!evidence/logs/.gitkeep
+!evidence/screenshots/.gitkeep
+!evidence/videos/.gitkeep
