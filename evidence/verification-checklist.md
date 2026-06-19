@@ -1,6 +1,7 @@
 # Verification Checklist
 
 - [ ] `@qvac/sdk` is installed.
+- [ ] Optional dependencies are included for final QVAC runs.
 - [ ] Final run does not set `QVAC_ALLOW_MOCK=1`.
 - [ ] QVAC model loads on consumer hardware.
 - [ ] Embeddings are generated locally.

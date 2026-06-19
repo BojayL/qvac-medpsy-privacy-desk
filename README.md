@@ -45,6 +45,14 @@ The planned primary demo machine is a Windows desktop with an NVIDIA GeForce RTX
 
 ## Setup
 
+Fast UI/workflow validation without native QVAC runtime packages:
+
+```bash
+npm install --omit=optional
+```
+
+Final local QVAC inference setup:
+
 ```bash
 npm install
 ```
@@ -107,6 +115,7 @@ npm start
 - PDF ingestion is not included in the core demo.
 - The current local vector store is intentionally simple and transparent; embeddings and answer generation remain QVAC-powered through `@qvac/sdk`.
 - `@qvac/rag` was evaluated, but its current HyperDB/RocksDB dependency path made Windows installation less reliable for the demo machine. A future adapter can replace the transparent JSON vector store after the core QVAC SDK path is stable.
+- `@qvac/sdk` is an optional dependency so the UI and evidence workflow can be installed quickly with `npm install --omit=optional`; final judging runs must install optional dependencies and run without mock mode.
 - `QVAC_ALLOW_MOCK=1` exists only to develop and test the interface without a loaded model. It must be disabled for final judging evidence.
 
 ## License
