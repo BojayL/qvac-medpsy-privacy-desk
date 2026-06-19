@@ -2,7 +2,7 @@ export type Role = "user" | "assistant";
 
 export type RuntimeStatus = {
   ok: boolean;
-  qvacMode: "qvac" | "mock" | "unavailable";
+  qvacMode: "qvac" | "mock" | "standby" | "unavailable";
   llmModel: string;
   embeddingModel: string;
   hardwareLabel: string;

@@ -28,7 +28,7 @@ export class QvacRuntime {
   private sdk: QvacSdk | null = null;
   private modelId: string | null = null;
   private embeddingModelId: string | null = null;
-  private mode: "qvac" | "mock" | "unavailable" = "unavailable";
+  private mode: "qvac" | "mock" | "standby" | "unavailable" = "standby";
 
   constructor(private readonly config: QvacConfig) {
     if (config.allowMock) this.mode = "mock";

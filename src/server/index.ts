@@ -54,6 +54,8 @@ async function handleApi(req: IncomingMessage, res: ServerResponse, url: URL) {
       message:
         qvac.status.qvacMode === "mock"
           ? "Mock mode enabled. Use @qvac/sdk before submission."
+          : qvac.status.qvacMode === "standby"
+            ? "Local QVAC runtime is configured and will lazy-load models on the first query."
           : "Local QVAC runtime status is reported by the server."
     };
     sendJson(res, 200, status);
