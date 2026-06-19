@@ -6,15 +6,18 @@
 4. For final QVAC inference on Windows, run:
 
 ```powershell
-.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-runtime
-$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-runtime\node_modules"
+.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-full-runtime -Flavor full
+$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-full-runtime\node_modules"
+$env:QVAC_SDK_FLAVOR="full"
 ```
 5. Configure QVAC model environment variables if needed:
 
-```bash
-export QVAC_LLM_MODEL="qvac/MedPsy-1.7B-GGUF"
-export QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
+```powershell
+$env:QVAC_LLM_MODEL="C:\qvac-models\MedPsy-1.7B-Q4_K_M.gguf"
+$env:QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
 ```
+
+For a stable fallback demo, set `$env:QVAC_LLM_MODEL="LLAMA_3_2_1B_INST_Q4_0"` after the official model is downloaded or cached. The MedPsy repository name alone is not a model file path; download a GGUF first when using MedPsy.
 
 6. Seed local sample documents:
 
@@ -34,8 +37,9 @@ npm run dev
 
 Development-only mock mode:
 
-```bash
-QVAC_ALLOW_MOCK=1 npm run dev
+```powershell
+$env:QVAC_ALLOW_MOCK="1"
+npm run dev
 ```
 
 Mock mode is not acceptable as final inference evidence.

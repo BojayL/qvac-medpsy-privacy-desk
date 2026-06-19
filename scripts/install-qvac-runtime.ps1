@@ -1,5 +1,7 @@
 param(
-  [string]$RuntimeDir = "C:\qvac-runtime",
+  [string]$RuntimeDir = "C:\qvac-full-runtime",
+  [ValidateSet("full", "bare")]
+  [string]$Flavor = "full",
   [string]$Registry = "https://registry.npmjs.org"
 )
 
@@ -12,17 +14,27 @@ if (-not (Test-Path "package.json")) {
   npm init -y | Out-Null
 }
 
-$packageJson = @{
-  name = "qvac-privacy-desk-runtime"
-  version = "0.1.0"
-  private = $true
-  type = "module"
-  dependencies = @{
+if ($Flavor -eq "full") {
+  $dependencies = @{
+    "@qvac/sdk" = "0.13.5"
+    "b4a" = "1.8.1"
+  }
+} else {
+  $dependencies = @{
     "@qvac/bare-sdk" = "0.13.5"
     "b4a" = "1.8.1"
     "@qvac/llm-llamacpp" = "0.24.0"
     "@qvac/embed-llamacpp" = "0.19.1"
   }
+}
+
+$packageJson = @{
+  name = "qvac-privacy-desk-runtime"
+  version = "0.1.0"
+  private = $true
+  type = "module"
+  qvacSdkFlavor = $Flavor
+  dependencies = $dependencies
 }
 
 $packageJson | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 "package.json"
@@ -38,5 +50,6 @@ if ($LASTEXITCODE -ne 0) {
   throw "npm install failed with exit code $LASTEXITCODE"
 }
 
-Write-Host "QVAC runtime installed at $RuntimeDir"
+Write-Host "QVAC $Flavor runtime installed at $RuntimeDir"
 Write-Host "Set QVAC_RUNTIME_NODE_MODULES=$RuntimeDir\node_modules before starting the app."
+Write-Host "Set QVAC_SDK_FLAVOR=$Flavor before starting the app."

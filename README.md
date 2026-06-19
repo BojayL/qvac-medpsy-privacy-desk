@@ -54,8 +54,9 @@ npm install
 Enable final local QVAC inference:
 
 ```powershell
-.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-runtime
-$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-runtime\node_modules"
+.\scripts\install-qvac-runtime.ps1 -RuntimeDir C:\qvac-full-runtime -Flavor full
+$env:QVAC_RUNTIME_NODE_MODULES="C:\qvac-full-runtime\node_modules"
+$env:QVAC_SDK_FLAVOR="full"
 ```
 
 Seed sample local documents:
@@ -66,10 +67,12 @@ QVAC_ALLOW_MOCK=1 npm run seed
 
 For real submission runs, do not use mock mode. Configure QVAC model sources if needed:
 
-```bash
-export QVAC_LLM_MODEL="qvac/MedPsy-1.7B-GGUF"
-export QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
+```powershell
+$env:QVAC_LLM_MODEL="C:\qvac-models\MedPsy-1.7B-Q4_K_M.gguf"
+$env:QVAC_EMBEDDING_MODEL="EMBEDDINGGEMMA_300M_Q4_0"
 ```
+
+`QVAC_LLM_MODEL` may be an official QVAC SDK model constant such as `LLAMA_3_2_1B_INST_Q4_0`, a local GGUF file path, or another model source accepted by `@qvac/sdk`. The MedPsy Hugging Face repository name is not by itself a local model file; download the GGUF first and point this variable at the downloaded path.
 
 Run the app:
 

@@ -9,6 +9,7 @@ type QvacSdk = {
   completion?: (opts: Record<string, unknown>) => PromiseLike<unknown> | unknown;
   embed?: (opts: Record<string, unknown>) => PromiseLike<unknown> | unknown;
   LLAMA_3_2_1B_INST_Q4_0?: string;
+  VERBOSITY?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
@@ -57,6 +58,7 @@ export class QvacRuntime {
       this.modelId = await this.sdk.loadModel({
         modelSrc,
         modelType: "llamacpp-completion",
+        modelConfig: buildModelConfig(this.sdk),
         onProgress: (progress: unknown) => {
           process.stdout.write(`QVAC load progress: ${JSON.stringify(progress)}\n`);
         }
@@ -78,7 +80,13 @@ export class QvacRuntime {
     const result = await this.sdk.completion({
       modelId: this.modelId,
       history,
-      stream: true
+      stream: true,
+      generationParams: {
+        temp: Number(process.env.QVAC_TEMP ?? 0.35),
+        top_p: Number(process.env.QVAC_TOP_P ?? 0.9),
+        top_k: Number(process.env.QVAC_TOP_K ?? 20),
+        predict: Number(process.env.QVAC_PREDICT ?? 768)
+      }
     });
 
     return await readCompletionText(result);
@@ -96,6 +104,7 @@ export class QvacRuntime {
       this.embeddingModelId = await this.sdk.loadModel({
         modelSrc,
         modelType: "llamacpp-embedding",
+        modelConfig: buildModelConfig(this.sdk),
         onProgress: (progress: unknown) => {
           process.stdout.write(`QVAC embedding load progress: ${JSON.stringify(progress)}\n`);
         }
@@ -140,6 +149,7 @@ export class QvacRuntime {
 async function importQvacSdk() {
   const packageName = ["@qvac", "sdk"].join("/");
   const runtimeModules = process.env.QVAC_RUNTIME_NODE_MODULES;
+  const flavor = process.env.QVAC_SDK_FLAVOR ?? "full";
   const importFromRuntime = async (specifier: string) => {
     if (!runtimeModules) return await import(specifier);
     const requireFromRuntime = createRequire(path.join(runtimeModules, "qvac-runtime.cjs"));
@@ -147,14 +157,14 @@ async function importQvacSdk() {
     return await import(pathToFileURL(modulePath).href);
   };
 
-  if (runtimeModules) {
+  if (flavor === "bare") {
     try {
       const bareSdk = await importFromRuntime(["@qvac", "bare-sdk"].join("/"));
       const llm = await importFromRuntime("@qvac/bare-sdk/llamacpp-completion/plugin");
       const embedding = await importFromRuntime("@qvac/bare-sdk/llamacpp-embedding/plugin");
       return bareSdk.plugins([llm.llmPlugin, embedding.embeddingsPlugin]) as QvacSdk;
     } catch (error) {
-      if (process.env.QVAC_SDK_FLAVOR === "bare") throw error;
+      throw error;
     }
   }
   return (await importFromRuntime(packageName)) as QvacSdk;
@@ -164,6 +174,15 @@ function resolveModelSource(sdk: QvacSdk, configured: string) {
   const value = sdk[configured];
   if (typeof value === "string" || isRecord(value)) return value;
   return configured;
+}
+
+function buildModelConfig(sdk: QvacSdk) {
+  const verbosity = sdk.VERBOSITY;
+  return {
+    device: process.env.QVAC_DEVICE ?? "gpu",
+    ctx_size: Number(process.env.QVAC_CTX_SIZE ?? 4096),
+    ...(isRecord(verbosity) && "ERROR" in verbosity ? { verbosity: verbosity.ERROR } : {})
+  };
 }
 
 export function buildGroundedPrompt(question: string, sources: SourceSnippet[]) {

@@ -2,11 +2,17 @@
 
 Primary target:
 
-- `qvac/MedPsy-1.7B-GGUF`
+- MedPsy 1.7B GGUF loaded from a local `.gguf` file path, for example `C:\qvac-models\MedPsy-1.7B-Q4_K_M.gguf`.
 
 Fallback:
 
 - Official QVAC SDK quickstart model such as `LLAMA_3_2_1B_INST_Q4_0`, only if MedPsy setup blocks final demo stability.
+
+Windows runtime validation:
+
+- Full `@qvac/sdk@0.13.5` installed in an isolated runtime directory starts the Bare worker successfully.
+- The MedPsy Hugging Face repository name is not passed directly to `loadModel`; the SDK expects a concrete model source such as a local GGUF path.
+- The official quickstart model descriptor began downloading from the QVAC registry, but the initial run timed out during the large GGUF download. The next final run should use already-downloaded local model files when possible.
 
 QVAC SDK usage:
 
